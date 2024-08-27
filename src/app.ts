@@ -23,12 +23,14 @@ export function processReadings(readings: TemperatureReading[]) {
       cityData.set(city, new Map())
     }
     const cityMap = cityData.get(city)
-    if (cityMap != null && cityMap != undefined) {
+
+    if(cityMap === undefined) return
+
       if (!cityMap.has(dateStr)) {
         cityMap.set(dateStr, [])
       }
+      
       cityMap.get(dateStr)!.push(temperature)
-    }
   })
 }
 
@@ -38,10 +40,13 @@ export function getTemperatureSummary(
 ): TemperatureSummary | null {
   const dateStr = date.toISOString().split('T')[0]
   const cityMap = cityData.get(city)
+
   if (!cityMap) {
     return null
   }
+
   const temperatures = cityMap.get(dateStr)
+
   if (!temperatures || temperatures.length === 0) {
     return null
   }
@@ -50,8 +55,7 @@ export function getTemperatureSummary(
   const last = temperatures[temperatures.length - 1]
   const high = Math.max(...temperatures)
   const low = Math.min(...temperatures)
-  const average =
-    temperatures.reduce((sum, temp) => sum + temp, 0) / temperatures.length
+  const average = temperatures.reduce((sum, temp) => sum + temp, 0) / temperatures.length
 
   return {
     first,
