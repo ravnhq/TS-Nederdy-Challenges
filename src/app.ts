@@ -14,10 +14,7 @@ interface TemperatureSummary {
 }
 
 // Interface
-interface RecordedCity {
-  time: Date
-  city: string
-}
+interface RecordedCity extends Omit<TemperatureReading, 'temperature'>  { }
 
 function isSameDay(date1: Date, date2: Date) {
   return (
@@ -33,14 +30,10 @@ let citiesData: TemperatureReading[] = []
 export function processReadings(readings: TemperatureReading[]) {
   citiesData = readings
 
-  const mappedData = readings.map((reading) => {
-    const city: RecordedCity = {
-      time: reading.time,
-      city: reading.city,
-    }
-
-    return city
-  })
+  const mappedData = readings.map((reading) => ({
+    time: reading.time,
+    city: reading.city
+  }))
 
   const dayReadings = mappedData.reduce<RecordedCity[]>(
     (accumulator, current) => {
@@ -50,12 +43,10 @@ export function processReadings(readings: TemperatureReading[]) {
       )
 
       if (existingData === undefined) {
-        const data: RecordedCity = {
+        accumulator.push({
           time: current.time,
           city: current.city,
-        }
-
-        accumulator.push(data)
+        })
       }
 
       return accumulator
@@ -78,26 +69,26 @@ export function getTemperatureSummary(
     (reading) => reading.city === city && isSameDay(reading.time, date),
   )
 
-  if (selectedCityInformation.length === 0) {
+  if (!selectedCityInformation.length) {
     return null
-  } else {
-    const temperatures = selectedCityInformation.map(
-      (information) => information.temperature,
-    )
-
-    const sumOfTemps = temperatures.reduce(
-      (accumulator, currentValue) => accumulator + currentValue,
-      0,
-    )
-
-    const summary: TemperatureSummary = {
-      first: temperatures[0],
-      last: temperatures[temperatures.length - 1],
-      high: Math.max(...temperatures),
-      low: Math.min(...temperatures),
-      average: sumOfTemps / temperatures.length,
-    }
-
-    return summary
   }
+
+  const temperatures = selectedCityInformation.map(
+    (information) => information.temperature,
+  )
+
+  const sumOfTemps = temperatures.reduce(
+    (accumulator, currentValue) => accumulator + currentValue,
+    0,
+  )
+
+  const summary: TemperatureSummary = {
+    first: temperatures[0],
+    last: temperatures[temperatures.length - 1],
+    high: Math.max(...temperatures),
+    low: Math.min(...temperatures),
+    average: sumOfTemps / temperatures.length,
+  }
+
+  return summary
 }
