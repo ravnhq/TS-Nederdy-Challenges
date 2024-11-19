@@ -132,5 +132,9 @@
  * }
  * 
  * type UserRequiredName = RequiredByKeys<User, 'name'>; 
- * // expected to be: { name: string; age?: number; address?: string }
+ * expected to be: { name: string; age?: number; address?: string }
  */
+
+// Add here your solution
+
+// Add here your example
