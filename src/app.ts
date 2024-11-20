@@ -23,14 +23,6 @@ export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  const summary: TemperatureSummary = {
-    first: 0,
-    last: 0,
-    high: 0,
-    low: 0,
-    average: 0,
-  }
-
   const filteredReadings = globalReadings.filter(
     (reading) =>
       reading.city === city && reading.time.getTime() === date.getTime(),
@@ -40,25 +32,33 @@ export function getTemperatureSummary(
     return null
   }
 
-  let index = 0
-  let temperatureAcc = 0
-  for (const reading of filteredReadings) {
-    temperatureAcc += reading.temperature
-    if (index === 0) {
-      summary.first = reading.temperature
-      summary.high = reading.temperature
-      summary.low = reading.temperature
-    } else if (index === filteredReadings.length - 1) {
-      summary.last = reading.temperature
-      summary.average = temperatureAcc / filteredReadings.length
-    }
+  const summary = filteredReadings.reduce(
+    (acc, reading, index) => {
+      acc.total = acc.total + reading.temperature
 
-    summary.high =
-      summary.high > reading.temperature ? summary.high : reading.temperature
-    summary.low =
-      summary.low < reading.temperature ? summary.low : reading.temperature
-    index++
-  }
+      if (index === 0) {
+        acc.first = reading.temperature
+        acc.high = reading.temperature
+        acc.low = reading.temperature
+      }
+      if (index === filteredReadings.length - 1) {
+        acc.last = reading.temperature
+        acc.average = acc.total / filteredReadings.length
+      }
+      acc.high = acc.high > reading.temperature ? acc.high : reading.temperature
+      acc.low = acc.low < reading.temperature ? acc.low : reading.temperature
+
+      return acc
+    },
+    {
+      first: 0,
+      last: 0,
+      high: 0,
+      low: 0,
+      average: 0,
+      total: 0,
+    },
+  )
 
   return summary
 }
