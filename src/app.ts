@@ -3,11 +3,34 @@ import { formatDate, getLowestValue, getMaxValue, getAverage } from './utils'
 
 // example interfaces that can be use
 // TIP: the types mentioned in the interfaces must be fulfilled in order to solve the problem.
+type Readings = {
+  [city: string]: {
+    [date: string]: {
+      temperature: number
+    }[]
+  }
+}
 
 const processedReadings: TemperatureReading[] = []
 
 export function processReadings(readings: TemperatureReading[]): void {
   processedReadings.push(...readings)
+
+  // DIVIDE READINGS BY CITY IDENTIFIER, CREATING CHUNKS
+
+  const readingByCity = readings.reduce<Readings>((acc, value) => {
+    const entry = {}
+
+    const city = value.city
+
+    if (!acc[city]) {
+      acc[city] = []
+    }
+
+    acc[city].push(entry)
+
+    return acc
+  }, {} as Readings)
 }
 
 export function getTemperatureSummary(
