@@ -46,11 +46,5 @@ export function getTemperatureSummary(
     currentTemperatures.reduce((prev, curr) => prev + curr.temperature, 0) /
     currentTemperatures.length
 
-  return {
-    first: first,
-    last: last,
-    high: high,
-    low: low,
-    average: average,
-  }
+  return { first, last, high, low, average }
 }
