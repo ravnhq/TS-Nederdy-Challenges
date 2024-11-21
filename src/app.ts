@@ -13,14 +13,44 @@ interface TemperatureSummary {
   average: number
 }
 
+const examples: TemperatureReading[] = []
+
 export function processReadings(readings: TemperatureReading[]): void {
-  // add here your code
+  examples.push(...readings)
 }
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  //add here your code
-  return null
+  const currentTemperatures = examples.filter(
+    (reading) =>
+      reading.time.getTime() === date.getTime() && reading.city === city,
+  )
+
+  if (currentTemperatures.length === 0) {
+    return null
+  }
+
+  const first = currentTemperatures[0]?.temperature
+
+  const last = currentTemperatures[currentTemperatures.length - 1]?.temperature
+
+  const high = Math.max(
+    ...currentTemperatures.map((reading) => reading.temperature),
+  )
+  const low = Math.min(
+    ...currentTemperatures.map((reading) => reading.temperature),
+  )
+  const average =
+    currentTemperatures.reduce((prev, curr) => prev + curr.temperature, 0) /
+    currentTemperatures.length
+
+  return {
+    first: first,
+    last: last,
+    high: high,
+    low: low,
+    average: average,
+  }
 }
