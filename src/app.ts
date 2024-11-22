@@ -5,6 +5,7 @@ interface TemperatureReading {
   temperature: number
   city: string
 }
+
 interface TemperatureSummary {
   first: number
   last: number
@@ -13,52 +14,61 @@ interface TemperatureSummary {
   average: number
 }
 
-const globalReadings: TemperatureReading[] = []
+interface CustomTemperatureSummary extends TemperatureSummary {
+  count: number
+}
+
+const globalMap: Map<string, Map<number, CustomTemperatureSummary>> = new Map()
 
 export function processReadings(readings: TemperatureReading[]): void {
-  globalReadings.push(...readings)
+  for (const { time, temperature, city } of readings) {
+    if (!globalMap.has(city)) {
+      globalMap.set(city, new Map())
+    }
+
+    const cityMap: Map<number, CustomTemperatureSummary> = globalMap.get(
+      city,
+    ) as Map<number, CustomTemperatureSummary>
+    const numberTime: number = time.getTime()
+
+    if (!cityMap.has(numberTime)) {
+      cityMap.set(numberTime, {
+        average: 0,
+        high: -Infinity,
+        low: Infinity,
+        first: temperature,
+        last: temperature,
+        count: 0,
+      })
+    }
+
+    const cityTime: CustomTemperatureSummary = cityMap.get(
+      numberTime,
+    ) as CustomTemperatureSummary
+
+    cityTime.low = cityTime.low < temperature ? cityTime.low : temperature
+    cityTime.high = cityTime.high > temperature ? cityTime.high : temperature
+    cityTime.count = cityTime.count + 1
+    cityTime.average =
+      (cityTime.average * (cityTime.count - 1) + temperature) / cityTime.count
+    cityTime.last = temperature
+  }
 }
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  const filteredReadings = globalReadings.filter(
-    (reading) =>
-      reading.city === city && reading.time.getTime() === date.getTime(),
-  )
-
-  if (!filteredReadings.length) {
+  const cityMap: Map<number, CustomTemperatureSummary> | undefined =
+    globalMap.get(city)
+  if (!cityMap) {
     return null
   }
 
-  const summary = filteredReadings.reduce(
-    (acc, reading, index) => {
-      acc.total = acc.total + reading.temperature
+  const cityTimeSummary = cityMap.get(date.getTime())
+  if (!cityTimeSummary) {
+    return null
+  }
 
-      if (index === 0) {
-        acc.first = reading.temperature
-        acc.high = reading.temperature
-        acc.low = reading.temperature
-      }
-      if (index === filteredReadings.length - 1) {
-        acc.last = reading.temperature
-        acc.average = acc.total / filteredReadings.length
-      }
-      acc.high = acc.high > reading.temperature ? acc.high : reading.temperature
-      acc.low = acc.low < reading.temperature ? acc.low : reading.temperature
-
-      return acc
-    },
-    {
-      first: 0,
-      last: 0,
-      high: 0,
-      low: 0,
-      average: 0,
-      total: 0,
-    },
-  )
-
-  return summary
+  return cityTimeSummary as TemperatureSummary
 }
