@@ -18,7 +18,7 @@ interface CustomTemperatureSummary extends TemperatureSummary {
   count: number
 }
 
-const globalMap: Map<string, Map<number, CustomTemperatureSummary>> = new Map()
+const TemperatureSummaryByCity: Map<string, Map<number, CustomTemperatureSummary>> = new Map()
 
 export function processReadings(readings: TemperatureReading[]): void {
   for (const { time, temperature, city } of readings) {
