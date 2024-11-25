@@ -18,17 +18,22 @@ interface CustomTemperatureSummary extends TemperatureSummary {
   count: number
 }
 
-const TemperatureSummaryByCity: Map<string, Map<number, CustomTemperatureSummary>> = new Map()
+const TemperatureSummaryByCity: Map<
+  string,
+  Map<number, CustomTemperatureSummary>
+> = new Map()
 
 export function processReadings(readings: TemperatureReading[]): void {
   for (const { time, temperature, city } of readings) {
-    if (!globalMap.has(city)) {
-      globalMap.set(city, new Map())
+    if (!TemperatureSummaryByCity.has(city)) {
+      TemperatureSummaryByCity.set(city, new Map())
     }
 
-    const cityMap: Map<number, CustomTemperatureSummary> = globalMap.get(
-      city,
-    ) as Map<number, CustomTemperatureSummary>
+    const cityMap: Map<number, CustomTemperatureSummary> =
+      TemperatureSummaryByCity.get(city) as Map<
+        number,
+        CustomTemperatureSummary
+      >
     const numberTime: number = time.getTime()
 
     if (!cityMap.has(numberTime)) {
@@ -60,7 +65,7 @@ export function getTemperatureSummary(
   city: string,
 ): TemperatureSummary | null {
   const cityMap: Map<number, CustomTemperatureSummary> | undefined =
-    globalMap.get(city)
+    TemperatureSummaryByCity.get(city)
   if (!cityMap) {
     return null
   }
