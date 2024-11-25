@@ -6,6 +6,10 @@
 2. Before you start making changes create a new `develop` branch (`git checkout -b develop`)
 3. Run `yarn install` in your terminar for install the dependencies
 
+## Execute solutions:
+
+For the tests use: `yarn test` and for the Utility types exercise use `yarn types`;
+
 ## Content Chanllange
 
 You are given a list of temperatures that ocurred for major US cities over the past week. Temperature readings were taken ad inconsistent intervals. Process the temperature readings and create a function that will retun a summary of the temperature data for a given dat. The summary should include the following information:
@@ -27,5 +31,3 @@ The `getTemperatureSummary` function will be called any number of items with a d
 When you have finished your challenge, please run the next command `yarn test` to make sure your code works as expected.
 
 Recomendation: for a better performance and clean code please run the command `yarn format` and `yarn lint`
-
-
