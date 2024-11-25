@@ -180,6 +180,9 @@ function testExercise4() {
   console.log(result) // 1
   console.log(typeof result) // "number"
 
+  if (typeof result === "number") {
+    console.error("\tSame type Number !");
+  }
   // result = "number"; ///ERROR: Type 'string' is not assignable to type 'number'.ts(2322)
 }
 
@@ -275,7 +278,7 @@ type ExamplePromise2 = MyAwaitedOneLevelPromise<Promise<string>> // string
 // Required Partial
 // Partial<T> & Required<K>
 type RequiredByKeys<T, K extends keyof T = keyof T> = Omit<T, K> &
-  { [P in K]-?: T[P] }
+{ [P in K]-?: T[P] }
 
 // Add here your example
 interface User {
@@ -296,4 +299,12 @@ const userFull: UserRequired = {
   address: 'ads',
   age: 32,
   name: 'ad',
+}
+
+if (typeof userFull === typeof {
+  address: 'ads',
+  age: 32,
+  name: 'ad',
+}) {
+  console.log("Same type!");
 }
