@@ -12,7 +12,9 @@
   "license": "ISC",
   "description": "Typescript challange",
   "dependencies": {
-    "jest": "^26.6.3"
+    "@types/object.groupby": "^1.0.4",
+    "jest": "^26.6.3",
+    "object.groupby": "^1.0.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.22.1",
