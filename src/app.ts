@@ -13,38 +13,37 @@ interface TemperatureSummary {
   average: number
 }
 
-const examples: TemperatureReading[] = []
+const temperatureReadings: TemperatureReading[] = []
 
 export function processReadings(readings: TemperatureReading[]): void {
-  examples.push(...readings)
+  temperatureReadings.push(...readings)
 }
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  const currentTemperatures = examples.filter(
-    (reading) =>
-      reading.time.getTime() === date.getTime() && reading.city === city,
+  const selectedTemperatureReadings = temperatureReadings.filter(
+    (temperatureReading) =>
+      temperatureReading.time.getTime() === date.getTime() &&
+      temperatureReading.city === city,
   )
 
-  if (currentTemperatures.length === 0) {
+  if (selectedTemperatureReadings.length === 0) {
     return null
   }
 
-  const first = currentTemperatures[0]?.temperature
-
-  const last = currentTemperatures[currentTemperatures.length - 1]?.temperature
-
-  const high = Math.max(
-    ...currentTemperatures.map((reading) => reading.temperature),
+  const computedTemperature = selectedTemperatureReadings.map(
+    (reading) => reading.temperature,
   )
-  const low = Math.min(
-    ...currentTemperatures.map((reading) => reading.temperature),
-  )
-  const average =
-    currentTemperatures.reduce((prev, curr) => prev + curr.temperature, 0) /
-    currentTemperatures.length
 
-  return { first, last, high, low, average }
+  return {
+    first: computedTemperature[0],
+    last: computedTemperature[selectedTemperatureReadings.length - 1],
+    high: Math.max(...computedTemperature),
+    low: Math.min(...computedTemperature),
+    average:
+      computedTemperature.reduce((prev, curr) => prev + curr, 0) /
+      selectedTemperatureReadings.length,
+  }
 }
