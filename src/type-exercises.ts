@@ -1,6 +1,4 @@
-/*eslint-disable*/
-
-
+/* eslint-disable no-console */
 /**
  * Exercise #1: Filter object properties by type.
  *
@@ -23,55 +21,25 @@
  * }
  */
 
-
 // Add here your solution
-const greeting = <T, U>(toFilter: T, toOmmit: U) => {
-    let finalObject: Partial<T> = {};
-    for (const key in toFilter) {
-        if (typeof toFilter[key] !== typeof toOmmit) {
-            finalObject[key] = toFilter[key];
-        }
-    }
-    return finalObject as Partial<T>;
-}
+type OmitByType<T, U> = Omit<
+  T,
+  {
+    [K in keyof T]: T[K] extends U ? K : never
+  }[keyof T]
+>
 
-interface customType {
-    name: string,
-    count: number,
-    isReadonly: boolean,
-    isEnable: boolean
-}
 // Add here your example
-console.log('Exercise #1: Filter object properties by type ✨');
-console.log('Ommiting string type from the object');
-console.log(
-    greeting<customType, string>({
-        name: 'test',
-        count: 1,
-        isReadonly: true,
-        isEnable: false
-    }, '')
-);
 
-console.log('Ommiting boolean type from the object');
-console.log(
-    greeting<customType, boolean>({
-        name: 'test',
-        count: 1,
-        isReadonly: true,
-        isEnable: false
-    }, false)
-);
-
-console.log('Ommiting number type from the object');
-console.log(
-    greeting<customType, number>({
-        name: 'test',
-        count: 1,
-        isReadonly: true,
-        isEnable: false
-    }, 0)
-);
+type OmitBoolean = OmitByType<
+  {
+    name: string
+    count: number
+    isReadonly: boolean
+    isEnable: boolean
+  },
+  boolean
+>
 
 /**
  * Exercise #2: Implement the utility type `If<C, T, F>`, which evaluates a condition `C`
@@ -89,17 +57,18 @@ console.log(
  */
 
 // Add here your solution
-type If<C extends boolean, T, F> = C extends true ? T : F;
+type If<TCondition extends boolean, TTrueValue, TFalseValue> =
+  TCondition extends true ? TTrueValue : TFalseValue
 
 // Add here your example
-console.log('Exercise #2: Implement the utility type `If<C, T, F>` 👀');
-console.log('C is true');
-type A = If<true, 'a', 1>;
-console.log('Type A:', 'a' as A);
+console.log('Exercise #2: Implement the utility type `If<C, T, F>` 👀')
+console.log('C is true')
+type A = If<true, 'a', 1>
+console.log('Type A:', 'a' as A)
 
-console.log('C is false');
-type B = If<false, 'a', 1>;
-console.log('Type B:', 2 as B);
+console.log('C is false')
+type B = If<false, 'a', 1>
+console.log('Type B:', 2 as B)
 
 /**
  * Exercise #3: Recreate the built-in `Readonly<T>` utility type without using it.
@@ -123,27 +92,27 @@ console.log('Type B:', 2 as B);
  * todo.description = "barFoo"; // Error: cannot reassign a readonly property
  */
 
-
 // Add here your solution
 type MyReadonly<T> = {
-    readonly [K in keyof T]: T[K];
-};
+  readonly [K in keyof T]: T[K]
+}
 
 interface Todo {
-    title: string;
-    description: string;
+  title: string
+  description: string
 }
 
 const todo: MyReadonly<Todo> = {
-    title: "Hey",
-    description: "foobar"
-};
+  title: 'Hey',
+  description: 'foobar',
+}
 
 // Add here your example
-console.log('Exercise #3: Recreate the built-in `Readonly<T>` utility type without using it ☃️');
-// todo.title = 'Hello'; 
-console.log(todo.title);
-
+console.log(
+  'Exercise #3: Recreate the built-in `Readonly<T>` utility type without using it ☃️',
+)
+// todo.title = 'Hello';
+console.log(todo.title)
 
 /**
  * Exercise #4: Recreate the built-in `ReturnType<T>` utility type without using it.
@@ -165,22 +134,22 @@ console.log(todo.title);
 
 // Add here your solution
 // type If<C extends boolean, T, F> = C extends true ? T : F;
-type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
+type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : any
 
 const fn = (v: boolean) => {
-    if (v) {
-        return true;
-    } else {
-        return true;
-    }
-};
+  if (v) {
+    return true
+  } else {
+    return true
+  }
+}
 
 // Add here your example
-console.log('Exercise #4: Recreate the built-in `ReturnType<T>` utility type without using it 🚀');
-type custom = MyReturnType<typeof fn>;
-console.log('Type a:', typeof (true as custom));
-
-
+console.log(
+  'Exercise #4: Recreate the built-in `ReturnType<T>` utility type without using it 🚀',
+)
+type custom = MyReturnType<typeof fn>
+console.log('Type a:', typeof (true as custom))
 
 /**
  * Exercise #5: Extract the type inside a wrapped type like `Promise`.
@@ -197,16 +166,16 @@ console.log('Type a:', typeof (true as custom));
  */
 
 // Add here your solution
-type MyAwaited<T> = T extends Promise<infer R> ? R : T;
+type MyAwaited<T> = T extends Promise<infer R> ? R : T
 
-const promise = new Promise<string>((resolve) => resolve('Desoltala, Erika'));
-let awaited: MyAwaited<typeof promise> = 'Asignando valor 👍';
+const promise = new Promise<string>((resolve) => resolve('Desoltala, Erika'))
+const awaited: MyAwaited<typeof promise> = 'Asignando valor 👍'
 
 // Add here your example
-console.log('Exercise #5: Extract the type inside a wrapped type like `Promise` 💡');
-console.log(typeof awaited);
-
-
+console.log(
+  'Exercise #5: Extract the type inside a wrapped type like `Promise` 💡',
+)
+console.log(typeof awaited)
 
 /**
  * Exercise 6: Create a utility type `RequiredByKeys<T, K>` that makes specific keys of `T` required.
@@ -230,19 +199,20 @@ console.log(typeof awaited);
  */
 
 // Add here your solution
-type RequiredByKeys<T, K extends keyof T = keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+type RequiredByKeys<T, K extends keyof T = keyof T> = Omit<T, K> &
+  Required<Pick<T, K>>
 
 interface User {
-    name?: string;
-    age?: number;
-    address?: string;
+  name?: string
+  age?: number
+  address?: string
 }
 
 // Add here your example
 
-console.log('Exercise #6: Create a utility type `RequiredByKeys<T, K>` 👻');
-type UserRequiredName = RequiredByKeys<User, 'name'>;
-type UserRequiredAll = RequiredByKeys<User>;
+console.log('Exercise #6: Create a utility type `RequiredByKeys<T, K>` 👻')
+type UserRequiredName = RequiredByKeys<User, 'name'>
+type UserRequiredAll = RequiredByKeys<User>
 
 // try {
 //     const user: UserRequiredName = {
@@ -259,4 +229,3 @@ type UserRequiredAll = RequiredByKeys<User>;
 // } catch (error) {
 //     console.error(error);
 // }
-
