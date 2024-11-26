@@ -25,42 +25,43 @@ export function getTemperatureSummary(
   city: string,
 ): TemperatureSummary | null {
   //add here your code
-  const citiesArray = temperatureReadings.filter(
-    (temperatureReading) =>
+  const readings = temperatureReadings.filter((temperatureReading) => {
+    return (
       temperatureReading.city === city &&
-      temperatureReading.time.toDateString() === date.toDateString(),
-  )
+      temperatureReading.time.toDateString() === date.toDateString()
+    )
+  })
 
-  if (citiesArray.length === 0) {
+  if (readings.length === 0) {
     return null
   }
 
-  const first = citiesArray[0].temperature
-  const last = citiesArray[citiesArray.length - 1].temperature
+  const firstTemperature = readings[0].temperature
+  const lastTemperature = readings[readings.length - 1].temperature
 
-  let highestTemperature = citiesArray[0].temperature
-  let lowest = citiesArray[0].temperature
-  let total = 0
+  let highestTemperature = readings[0].temperature
+  let lowestTemperature = readings[0].temperature
+  let totalTemperature = 0
 
-  citiesArray.forEach((city) => {
-    if (city.temperature > highestTemperature) {
-      highestTemperature = city.temperature
+  readings.forEach((reading) => {
+    if (reading.temperature > highestTemperature) {
+      highestTemperature = reading.temperature
     }
 
-    if (city.temperature < lowest) {
-      lowest = city.temperature
+    if (reading.temperature < lowestTemperature) {
+      lowestTemperature = reading.temperature
     }
 
-    total += city.temperature
+    totalTemperature += reading.temperature
   })
 
-  const average = total / citiesArray.length
+  const averageTemperature = totalTemperature / readings.length
 
   return {
-    first,
-    last,
+    first: firstTemperature,
+    last: lastTemperature,
     high: highestTemperature,
-    low: lowest,
-    average,
+    low: lowestTemperature,
+    average: averageTemperature,
   }
 }
