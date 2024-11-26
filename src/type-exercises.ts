@@ -22,11 +22,11 @@
  */
 
 // Add here your solution
-type OmitByType<T, U> = Omit<
-  T,
+type OmitByType<TObject, TExcludedType> = Omit<
+  TObject,
   {
-    [K in keyof T]: T[K] extends U ? K : never
-  }[keyof T]
+    [TKey in keyof TObject]: TObject[TKey] extends TExcludedType ? TKey : never
+  }[keyof TObject]
 >
 
 // Add here your example
@@ -93,8 +93,8 @@ console.log('Type B:', 2 as B)
  */
 
 // Add here your solution
-type MyReadonly<T> = {
-  readonly [K in keyof T]: T[K]
+type MyReadonly<TObject> = {
+  readonly [TKey in keyof TObject]: TObject[TKey]
 }
 
 interface Todo {
@@ -111,7 +111,7 @@ const todo: MyReadonly<Todo> = {
 console.log(
   'Exercise #3: Recreate the built-in `Readonly<T>` utility type without using it ☃️',
 )
-// todo.title = 'Hello';
+todo.title = 'Hello'
 console.log(todo.title)
 
 /**
@@ -134,7 +134,11 @@ console.log(todo.title)
 
 // Add here your solution
 // type If<C extends boolean, T, F> = C extends true ? T : F;
-type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : any
+type MyReturnType<TFunction> = TFunction extends (
+  ...args: any[]
+) => infer TReturnType
+  ? TReturnType
+  : any
 
 const fn = (v: boolean) => {
   if (v) {
@@ -166,7 +170,9 @@ console.log('Type a:', typeof (true as custom))
  */
 
 // Add here your solution
-type MyAwaited<T> = T extends Promise<infer R> ? R : T
+type MyAwaited<TPromise> = TPromise extends Promise<infer TResolved>
+  ? MyAwaited<TResolved>
+  : TPromise
 
 const promise = new Promise<string>((resolve) => resolve('Desoltala, Erika'))
 const awaited: MyAwaited<typeof promise> = 'Asignando valor 👍'
@@ -176,7 +182,7 @@ console.log(
   'Exercise #5: Extract the type inside a wrapped type like `Promise` 💡',
 )
 console.log(typeof awaited)
-
+type Test = MyAwaited<Promise<Promise<number>>>
 /**
  * Exercise 6: Create a utility type `RequiredByKeys<T, K>` that makes specific keys of `T` required.
  *
@@ -199,8 +205,8 @@ console.log(typeof awaited)
  */
 
 // Add here your solution
-type RequiredByKeys<T, K extends keyof T = keyof T> = Omit<T, K> &
-  Required<Pick<T, K>>
+type RequiredByKeys<TObject, TKeys extends keyof TObject = keyof TObject> =
+  Omit<TObject, TKeys> & Required<Pick<TObject, TKeys>>
 
 interface User {
   name?: string
@@ -213,19 +219,3 @@ interface User {
 console.log('Exercise #6: Create a utility type `RequiredByKeys<T, K>` 👻')
 type UserRequiredName = RequiredByKeys<User, 'name'>
 type UserRequiredAll = RequiredByKeys<User>
-
-// try {
-//     const user: UserRequiredName = {
-//         // name: 'Erika',
-//         age: 25,
-//         address: 'Calle 123'
-//     };
-
-//     const userAllKeysRequired: UserRequiredAll = {
-//         // name: 'Erika',
-//         // age: 25,
-//         // address: 'Calle 123'
-//     };
-// } catch (error) {
-//     console.error(error);
-// }
