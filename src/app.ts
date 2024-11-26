@@ -42,11 +42,15 @@ export function getTemperatureSummary(
 ): TemperatureSummary | null {
   const cityData = temperatureData.get(city)
 
-  if (!cityData) return null
+  if (!cityData) {
+    return null
+  }
 
   const dateData = cityData.get(formatDate(date))
 
-  if (!dateData || dateData.length === 0) return null
+  if (!dateData || dateData.length === 0) {
+    return null
+  }
 
   const first = dateData[0]
   const last = dateData[dateData.length - 1]
