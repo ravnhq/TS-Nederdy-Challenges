@@ -25,37 +25,35 @@ const TemperatureSummaryByCity: Map<
 
 export function processReadings(readings: TemperatureReading[]): void {
   for (const { time, temperature, city } of readings) {
-    if (!TemperatureSummaryByCity.has(city)) {
-      TemperatureSummaryByCity.set(city, new Map())
+    let cityMap = TemperatureSummaryByCity.get(city)
+
+    if (cityMap === undefined) {
+      cityMap = new Map()
+      TemperatureSummaryByCity.set(city, cityMap)
     }
 
-    const cityMap: Map<number, CustomTemperatureSummary> =
-      TemperatureSummaryByCity.get(city) as Map<
-        number,
-        CustomTemperatureSummary
-      >
     const numberTime: number = time.getTime()
 
-    if (!cityMap.has(numberTime)) {
-      cityMap.set(numberTime, {
+    let cityTime = cityMap.get(numberTime)
+
+    if (cityTime === undefined) {
+      cityTime = {
         average: 0,
         high: -Infinity,
         low: Infinity,
         first: temperature,
         last: temperature,
         count: 0,
-      })
+      }
+      cityMap.set(numberTime, cityTime)
     }
 
-    const cityTime: CustomTemperatureSummary = cityMap.get(
-      numberTime,
-    ) as CustomTemperatureSummary
+    const { low, high, count, average } = cityTime
 
-    cityTime.low = cityTime.low < temperature ? cityTime.low : temperature
-    cityTime.high = cityTime.high > temperature ? cityTime.high : temperature
-    cityTime.count = cityTime.count + 1
-    cityTime.average =
-      (cityTime.average * (cityTime.count - 1) + temperature) / cityTime.count
+    cityTime.low = low < temperature ? low : temperature
+    cityTime.high = high > temperature ? high : temperature
+    cityTime.count = count + 1
+    cityTime.average = (average * count + temperature) / (count + 1)
     cityTime.last = temperature
   }
 }
@@ -64,8 +62,7 @@ export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  const cityMap: Map<number, CustomTemperatureSummary> | undefined =
-    TemperatureSummaryByCity.get(city)
+  const cityMap = TemperatureSummaryByCity.get(city)
   if (!cityMap) {
     return null
   }
@@ -75,5 +72,5 @@ export function getTemperatureSummary(
     return null
   }
 
-  return cityTimeSummary as TemperatureSummary
+  return cityTimeSummary
 }
