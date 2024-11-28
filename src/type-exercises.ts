@@ -199,7 +199,9 @@ type functionType = MyReturnType<typeof readOrEditClient>
  */
 
 // Add here your solution
-type MyAwaited<T extends Promise<any>> = T extends Promise<infer U> ? U : never
+type MyAwaited<T extends Promise<unknown>> = T extends Promise<infer U>
+  ? U
+  : never
 
 // Add here your example
 type MyAwaitedClient = MyAwaited<Promise<Client>>
@@ -225,7 +227,10 @@ type MyAwaitedClient = MyAwaited<Promise<Client>>
  * // expected to be: { name: string; age?: number; address?: string }
  */
 
-type RequiredByKeys<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+type RequiredByKeys<T, K extends keyof T> = {
+  [P in keyof (Omit<T, K> & Required<Pick<T, K>>)]: (Omit<T, K> &
+    Required<Pick<T, K>>)[P]
+}
 
 type FullRequiredClient = RequiredByKeys<Client, 'alternativeCreditCard'>
 
