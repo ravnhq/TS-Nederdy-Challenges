@@ -1,4 +1,4 @@
-const { processReadings, getTemperatureSummary } = require('../dist/app')
+const { processReadings, getTemperatureSummary } = require('../src/app')
 
 const example = [
   {

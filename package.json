@@ -6,7 +6,9 @@
     "test": "yarn build && jest -u",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.js\"",
     "lint": "tsc --noEmit && eslint src/**/*.ts --color --max-warnings=0",
-    "build": "yarn tsc"
+    "build": "yarn tsc",
+    "tsc": "tsc ./src/app.ts --downlevelIteration",
+    "start": "node ./src/app.js"
   },
   "author": "",
   "license": "ISC",
