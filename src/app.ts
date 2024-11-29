@@ -13,14 +13,51 @@ interface TemperatureSummary {
   average: number
 }
 
+// is dictionary of key values (key is a number and value is an array)
+const dailyReadings: { [date_city: string]: TemperatureReading[] } = {}
+
 export function processReadings(readings: TemperatureReading[]): void {
-  // add here your code
+  readings.reduce((acc, curr) => {
+    if (acc[curr.city + curr.time.toDateString()]) {
+      acc[curr.city + curr.time.toDateString()].push(curr)
+    } else {
+      acc[curr.city + curr.time.toDateString()] = [curr]
+    }
+    return acc
+  }, dailyReadings)
 }
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  //add here your code
-  return null
+  const data = dailyReadings[city + date.toDateString()]
+  const readings = data === undefined || data.length === 0 ? undefined : data
+
+  if (readings) {
+    const response = readings.reduce(
+      (acc, { temperature }, index, array) => {
+        // test
+        acc.average += temperature
+        acc.low = temperature < acc.low ? temperature : acc.low
+        acc.high = temperature > acc.high ? temperature : acc.high
+        return acc
+      },
+      {
+        average: 0,
+        first: 0,
+        high: 0,
+        low: Number.MAX_SAFE_INTEGER,
+        last: 0,
+      },
+    )
+
+    response.average /= readings.length
+    response.first = readings[0].temperature
+    response.last = readings[readings.length - 1].temperature
+
+    return response
+  } else {
+    return null
+  }
 }
