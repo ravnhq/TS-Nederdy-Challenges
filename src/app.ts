@@ -11,39 +11,79 @@ interface TemperatureSummary {
   high: number
   low: number
   average: number
+  sum?: number | undefined
+  count?: number | undefined
 }
 
-const temperatureReadings: TemperatureReading[] = []
+interface TemperatureReadingSummaryGroup {
+  [key: string]: {
+    [date: string]: TemperatureSummary
+  }
+}
+
+const temperatureReadingSummaryGroup: TemperatureReadingSummaryGroup = {}
 
 export function processReadings(readings: TemperatureReading[]): void {
-  temperatureReadings.push(...readings)
+  readings.forEach((reading) => {
+    const city = reading.city
+    const date = reading.time.toLocaleDateString()
+
+    if (!temperatureReadingSummaryGroup[city]) {
+      temperatureReadingSummaryGroup[city] = {}
+    }
+
+    if (!temperatureReadingSummaryGroup[city][date]) {
+      temperatureReadingSummaryGroup[city][date] = {
+        first: reading.temperature,
+        last: reading.temperature,
+        high: reading.temperature,
+        low: reading.temperature,
+        sum: reading.temperature,
+        count: 1,
+        average: reading.temperature,
+      }
+    } else {
+      const summary = temperatureReadingSummaryGroup[city][date]
+
+      summary.last = reading.temperature
+      summary.high = Math.max(summary.high, reading.temperature)
+      summary.low = Math.min(summary.low, reading.temperature)
+
+      if (summary.sum === undefined) {
+        summary.sum = reading.temperature
+      } else {
+        summary.sum += reading.temperature
+      }
+
+      if (summary.count === undefined) {
+        summary.count = 1
+      } else {
+        summary.count++
+      }
+
+      summary.average = summary.sum / summary.count
+    }
+  })
+
+  for (const city in temperatureReadingSummaryGroup) {
+    for (const date in temperatureReadingSummaryGroup[city]) {
+      const summary = temperatureReadingSummaryGroup[city][date]
+
+      delete summary.sum
+      delete summary.count
+    }
+  }
 }
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  const selectedTemperatureReadings = temperatureReadings.filter(
-    (temperatureReading) =>
-      temperatureReading.time.getTime() === date.getTime() &&
-      temperatureReading.city === city,
-  )
+  const selectedTemperatureReadings = temperatureReadingSummaryGroup[city]
 
-  if (selectedTemperatureReadings.length === 0) {
+  if (!selectedTemperatureReadings) {
     return null
   }
 
-  const computedTemperature = selectedTemperatureReadings.map(
-    (reading) => reading.temperature,
-  )
-
-  return {
-    first: computedTemperature[0],
-    last: computedTemperature[selectedTemperatureReadings.length - 1],
-    high: Math.max(...computedTemperature),
-    low: Math.min(...computedTemperature),
-    average:
-      computedTemperature.reduce((prev, curr) => prev + curr, 0) /
-      selectedTemperatureReadings.length,
-  }
+  return selectedTemperatureReadings[date.toLocaleDateString()]
 }
