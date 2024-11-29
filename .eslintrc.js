@@ -1,14 +1,14 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: 'tsconfig.json',
-    sourceType: 'module',
+    project: "tsconfig.json",
+    sourceType: "module",
   },
-  plugins: ['@typescript-eslint/eslint-plugin', 'jest', 'import'],
+  plugins: ["@typescript-eslint/eslint-plugin", "jest", "import"],
   extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-    'plugin:import/typescript',
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:import/typescript",
   ],
   root: true,
   env: {
@@ -16,18 +16,18 @@ module.exports = {
     jest: true,
   },
   rules: {
-    '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-    'import/named': 'error',
-    'no-console': 'error',
-    semi: 'off',
-    'import/order': [
-      'error',
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "import/named": "error",
+    "no-console": "error",
+    semi: "off",
+    "import/order": [
+      "error",
       {
-        groups: ['builtin', 'external', 'parent', 'sibling', 'index'],
+        groups: ["builtin", "external", "parent", "sibling", "index"],
       },
     ],
   },
-}
+};
