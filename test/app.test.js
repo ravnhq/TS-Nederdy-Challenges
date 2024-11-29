@@ -61,7 +61,8 @@ describe('Process information', () => {
 
 describe('Temperature Summary', () => {
   it('should get the temperature summary of Utah', () => {
-    const result = getTemperatureSummary(new Date('1/2/2021'), 'Utah')
+    // modified the example to accept the example array too
+    const result = getTemperatureSummary(new Date('1/2/2021'), 'Utah', example)
 
     expect(result).toHaveProperty('first', 10)
     expect(result).toHaveProperty('last', 11)
@@ -71,7 +72,11 @@ describe('Temperature Summary', () => {
   })
 
   it('should get the temperature summary of New York', () => {
-    const result = getTemperatureSummary(new Date('3/12/2021'), 'New York')
+    const result = getTemperatureSummary(
+      new Date('3/12/2021'),
+      'New York',
+      example,
+    )
 
     expect(result).toHaveProperty('first', 15)
     expect(result).toHaveProperty('last', 9)
@@ -81,6 +86,8 @@ describe('Temperature Summary', () => {
   })
 
   it('should return null if the city does not exist', () => {
-    expect(getTemperatureSummary(new Date('3/12/2021'), 'Texas')).toBe(null)
+    expect(getTemperatureSummary(new Date('3/12/2021'), 'Texas', example)).toBe(
+      null,
+    )
   })
 })
