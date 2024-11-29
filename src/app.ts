@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const groupBy = require('object.groupby')
-
 // example interfaces that can be use
 // TIP: the types mentioned in the interfaces must be fulfilled in order to solve the problem.
 interface TemperatureReading {
@@ -17,39 +14,49 @@ interface TemperatureSummary {
 }
 
 // is dictionary of key values (key is a number and value is an array)
-let dailyReadings: { [date: string]: TemperatureReading[] }
+const dailyReadings: { [date_city: string]: TemperatureReading[] } = {}
 
 export function processReadings(readings: TemperatureReading[]): void {
-  dailyReadings = groupBy(readings, (value: TemperatureReading) => {
-    return value.time.toDateString()
-  })
+  readings.reduce((acc, curr) => {
+    if (acc[curr.city + curr.time.toDateString()]) {
+      acc[curr.city + curr.time.toDateString()].push(curr)
+    } else {
+      acc[curr.city + curr.time.toDateString()] = [curr]
+    }
+    return acc
+  }, dailyReadings)
 }
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  const readings = dailyReadings[date.toDateString()].filter((item) => {
-    return item.city === city
-  })
-  if (readings.length > 0) {
-    let avg = 0
-    let highest = 0
-    let lowest = Number.MAX_SAFE_INTEGER
-    for (const reading of readings) {
-      avg += reading.temperature
-      lowest = reading.temperature < lowest ? reading.temperature : lowest
-      highest = reading.temperature > highest ? reading.temperature : highest
-    }
-    avg /= readings.length
+  const data = dailyReadings[city + date.toDateString()]
+  const readings = data === undefined || data.length === 0 ? undefined : data
 
-    return {
-      average: avg,
-      first: readings[0].temperature,
-      high: highest,
-      last: readings[readings.length - 1].temperature,
-      low: lowest,
-    } as TemperatureSummary
+  if (readings) {
+    const response = readings.reduce(
+      (acc, { temperature }, index, array) => {
+        // test
+        acc.average += temperature
+        acc.low = temperature < acc.low ? temperature : acc.low
+        acc.high = temperature > acc.high ? temperature : acc.high
+        return acc
+      },
+      {
+        average: 0,
+        first: 0,
+        high: 0,
+        low: Number.MAX_SAFE_INTEGER,
+        last: 0,
+      },
+    )
+
+    response.average /= readings.length
+    response.first = readings[0].temperature
+    response.last = readings[readings.length - 1].temperature
+
+    return response
   } else {
     return null
   }
