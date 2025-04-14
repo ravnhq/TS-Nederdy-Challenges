@@ -192,5 +192,25 @@ async function handleData() {
  */
 
 // Add here your solution
+type Merge<T> = {
+  [P in keyof T]: T[P]
+}
+
+type RequiredByKeys<T, K extends keyof T = keyof T> = Merge<
+  Required<Pick<T, K>> & Omit<T, K>
+>
 
 // Add here your example
+interface User {
+  name?: string
+  age?: number
+  address?: string
+}
+
+type UserRequiredName = RequiredByKeys<User, 'name'>
+
+// Real-world usage
+const user: UserRequiredName = {
+  name: 'John', // required
+  // age and address remain optional
+}
