@@ -153,8 +153,22 @@ const result: Return = sum(2, 3) // OK
  */
 
 // Add here your solution
+type MyAwaited<T> = T extends Promise<infer U> ? U : never
 
 // Add here your example
+type DataPromise = Promise<{ id: number; name: string }>
+
+type Data = MyAwaited<DataPromise> // { id: number; name: string }
+
+// Real-world usage
+async function fetchData(): DataPromise {
+  return { id: 1, name: 'Item' }
+}
+
+async function handleData() {
+  const data: Data = await fetchData()
+  console.log(data.name)
+}
 
 /**
  * Exercise 6: Create a utility type `RequiredByKeys<T, K>` that makes specific keys of `T` required.
