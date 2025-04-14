@@ -92,8 +92,20 @@ const userSettings: ShowAdminPanel = {
  */
 
 // Add here your solution
+type MyReadonly<T> = {
+  readonly [P in keyof T]: T[P]
+}
 
 // Add here your example
+interface Todo {
+  title: string
+  description: string
+}
+
+const todo: MyReadonly<Todo> = {
+  title: 'Read book',
+  description: 'Finish TypeScript Challenge',
+}
 
 /**
  * Exercise #4: Recreate the built-in `ReturnType<T>` utility type without using it.
