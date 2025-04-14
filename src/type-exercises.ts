@@ -126,8 +126,17 @@ const todo: MyReadonly<Todo> = {
  */
 
 // Add here your solution
+type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never
 
 // Add here your example
+// Example function
+const sum = (a: number, b: number) => a + b
+
+// Extract return type
+type Return = MyReturnType<typeof sum> // number
+
+// Real-world usage
+const result: Return = sum(2, 3) // OK
 
 /**
  * Exercise #5: Extract the type inside a wrapped type like `Promise`.
