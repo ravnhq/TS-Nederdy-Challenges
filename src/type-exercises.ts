@@ -58,8 +58,16 @@ const config: OmitBoolean = {
  */
 
 // Add here your solution
+type If<C extends boolean, T, F> = C extends true ? T : F
 
 // Add here your example
+
+// Real-world usage
+type ShowAdminPanel = If<true, { admin: true }, { normal: false }>
+
+const userSettings: ShowAdminPanel = {
+  admin: true,
+}
 
 /**
  * Exercise #3: Recreate the built-in `Readonly<T>` utility type without using it.
