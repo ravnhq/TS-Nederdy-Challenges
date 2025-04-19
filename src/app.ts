@@ -29,7 +29,6 @@ function formatDate(date: Date): string {
 
 export function processReadings(readings: TemperatureReading[]): void {
   if (!Array.isArray(readings) || readings.length === 0) {
-    console.log('No readings provided or invalid readings array.')
     throw new Error('No readings provided or invalid readings array.')
   }
   for (const reading of readings) {
@@ -40,7 +39,6 @@ export function processReadings(readings: TemperatureReading[]): void {
       typeof reading.city !== 'string' ||
       reading.city.trim() === ''
     ) {
-      console.log('Invalid reading skipped: ', reading)
       throw new Error(`Invalid reading encountered: ${JSON.stringify(reading)}`)
     }
     // end of Data validation
@@ -64,12 +62,10 @@ export function getTemperatureSummary(
   city: string,
 ): TemperatureSummary | null {
   if (!(date instanceof Date) || isNaN(date.getTime())) {
-    console.log('Invalid date provided: ', date)
     throw new Error(`Invalid date provided: ${date}`)
   }
 
   if (typeof city !== 'string' || city.trim() === '') {
-    console.log('Invalid city name: ', city)
     throw new Error(`Invalid city name provided: ${city}`)
   }
   // end of data validation
