@@ -1,58 +1,6 @@
 // example interfaces that can be use
 // TIP: the types mentioned in the interfaces must be fulfilled in order to solve the problem.
 
-const example = [
-  {
-    time: new Date('1/3/2021'),
-    temperature: 8,
-    city: 'Utah',
-  },
-  {
-    time: new Date('1/2/2021'),
-    temperature: 10,
-    city: 'Utah',
-  },
-  {
-    time: new Date('1/2/2021'),
-    temperature: 9,
-    city: 'Utah',
-  },
-  {
-    time: new Date('1/2/2021'),
-    temperature: 12,
-    city: 'Utah',
-  },
-  {
-    time: new Date('1/2/2021'),
-    temperature: 11,
-    city: 'Utah',
-  },
-  {
-    time: new Date('3/12/2021'),
-    temperature: 15,
-    city: 'New York',
-  },
-  {
-    time: new Date('3/12/2021'),
-    temperature: 10,
-    city: 'New York',
-  },
-  {
-    time: new Date('3/12/2021'),
-    temperature: 11,
-    city: 'New York',
-  },
-  {
-    time: new Date('3/12/2021'),
-    temperature: 9,
-    city: 'New York',
-  },
-  {
-    time: new Date('3/13/2021'),
-    temperature: 16,
-    city: 'New York',
-  },
-]
 interface TemperatureReading {
   time: Date
   temperature: number
@@ -66,7 +14,7 @@ interface TemperatureSummary {
   average: number
 }
 
-const _readingsFormatted: {
+const readingsFormatted: {
   [city: string]: {
     [time: string]: TemperatureReading[]
   }
@@ -79,30 +27,62 @@ export function processReadings(readings: TemperatureReading[]): void {
     const { city, time } = r
     //console.log(city, time)
 
-    const timeF = new Intl.DateTimeFormat('en-US').format(new Date(time))
+    const timeF = new Intl.DateTimeFormat('en-US').format(time)
 
-    if (!_readingsFormatted[city]) {
-      _readingsFormatted[city] = {}
+    if (!readingsFormatted[city]) {
+      readingsFormatted[city] = {}
     }
 
-    if (!_readingsFormatted[city][timeF]) {
-      _readingsFormatted[city][timeF] = []
+    if (!readingsFormatted[city][timeF]) {
+      readingsFormatted[city][timeF] = []
     }
 
-    _readingsFormatted[city][timeF].push(r)
+    readingsFormatted[city][timeF].push(r)
   })
-}
 
-processReadings(example)
+  //1. Filtrar por city
+  for (const city in readingsFormatted) {
+    //2. Filtrar por fecha
+    for (const date in readingsFormatted[city]) {
+      //console.log(readingsFormatted[city][date])
+      //3. Ordenar por temperatura
+      readingsFormatted[city][date].sort(
+        (a, b) => a.time.getTime() - b.time.getTime(),
+      )
+    }
+  }
+}
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  //add here your code
-  console.log(_readingsFormatted)
+  const dateF = new Intl.DateTimeFormat('en-US').format(date)
 
-  return null
+  if (date && city && readingsFormatted[city] && readingsFormatted[city][dateF]) {
+ 
+
+    const tempReadings = readingsFormatted[city][dateF]
+    const first = tempReadings[0].temperature
+
+    const lastIndex = tempReadings.length - 1
+    const last = readingsFormatted[city][dateF][lastIndex].temperature
+    const average = tempReadings.reduce((sum, e) => sum + e.temperature, 0) / readingsFormatted[city][dateF].length
+    const high = Math.max(...tempReadings.map(e => e.temperature))
+    const low = Math.min(...tempReadings.map(r => r.temperature))
+
+
+    const temperatureResume: TemperatureSummary = {
+      first: first,
+      last: last,
+      average: average,
+      high: high,
+      low: low,
+    }
+
+    return temperatureResume
+  } else {
+    return null
+  }
 }
 
-getTemperatureSummary(new Date(1/2/2021), 'Utah');
