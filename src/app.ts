@@ -13,14 +13,35 @@ interface TemperatureSummary {
   average: number
 }
 
+let processedData: TemperatureReading[] = new Array<TemperatureReading>();
 export function processReadings(readings: TemperatureReading[]): void {
-  // add here your code
+  processedData = readings;
 }
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  //add here your code
-  return null
+  
+  const dataCityReadings = processedData.filter(reading => reading.city === city);
+  const dataFilterByDate = dataCityReadings.filter(//filter getting year, moth and day bcs of Date type, it can receive not only the year but time as well
+    reading =>
+      reading.time.getFullYear() === date.getFullYear() && 
+      reading.time.getMonth() === date.getMonth() &&
+      reading.time.getDate() === date.getDate()
+  );
+
+  if(dataFilterByDate.length !== 0){
+    const temperatures = dataFilterByDate.map(dataDate => dataDate.temperature);
+    const temperatureSummary: TemperatureSummary = {
+      first: temperatures[0],
+      average: temperatures.reduce((sum, t) => sum + t, 0) / temperatures.length,
+      high: Math.max(...temperatures),
+      last: temperatures[temperatures.length - 1],
+      low: Math.min(...temperatures)
+    }
+    return temperatureSummary;
+  }
+
+  return null;
 }
