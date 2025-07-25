@@ -1,6 +1,5 @@
 // example interfaces that can be use
 // TIP: the types mentioned in the interfaces must be fulfilled in order to solve the problem.
-
 interface TemperatureReading {
   time: Date
   temperature: number
@@ -14,43 +13,31 @@ interface TemperatureSummary {
   average: number
 }
 
-const readingsFormatted: {
-  [city: string]: {
-    [time: string]: TemperatureReading[]
-  }
-} = {}
+const readingsFormatted: Map<string, Map<string, TemperatureReading[]>> =
+  new Map()
 
 // Store temperature readings in a sorted way to facilitate searches by city and time
 export function processReadings(readings: TemperatureReading[]): void {
-  //console.log(readings, 'test')
   readings.forEach((r) => {
     const { city, time } = r
-    //console.log(city, time)
 
     const timeF = new Intl.DateTimeFormat('en-US').format(time)
 
-    if (!readingsFormatted[city]) {
-      readingsFormatted[city] = {}
+    let cityMap = readingsFormatted.get(city)
+
+    if (!cityMap) {
+      cityMap = new Map<string, TemperatureReading[]>()
+      readingsFormatted.set(city, cityMap)
     }
 
-    if (!readingsFormatted[city][timeF]) {
-      readingsFormatted[city][timeF] = []
+    let readingsArray = cityMap.get(timeF)
+    if (!readingsArray) {
+      readingsArray = []
+      cityMap.set(timeF, readingsArray)
     }
 
-    readingsFormatted[city][timeF].push(r)
+    readingsArray.push(r)
   })
-
-  //1. Filtrar por city
-  for (const city in readingsFormatted) {
-    //2. Filtrar por fecha
-    for (const date in readingsFormatted[city]) {
-      //console.log(readingsFormatted[city][date])
-      //3. Ordenar por temperatura
-      readingsFormatted[city][date].sort(
-        (a, b) => a.time.getTime() - b.time.getTime(),
-      )
-    }
-  }
 }
 
 export function getTemperatureSummary(
@@ -59,30 +46,29 @@ export function getTemperatureSummary(
 ): TemperatureSummary | null {
   const dateF = new Intl.DateTimeFormat('en-US').format(date)
 
-  if (date && city && readingsFormatted[city] && readingsFormatted[city][dateF]) {
- 
+  const cityMap = readingsFormatted.get(city)
+  if (!cityMap) return null
 
-    const tempReadings = readingsFormatted[city][dateF]
-    const first = tempReadings[0].temperature
+  const tempReadings = cityMap.get(dateF)
+  if (!tempReadings) return null
 
-    const lastIndex = tempReadings.length - 1
-    const last = readingsFormatted[city][dateF][lastIndex].temperature
-    const average = tempReadings.reduce((sum, e) => sum + e.temperature, 0) / readingsFormatted[city][dateF].length
-    const high = Math.max(...tempReadings.map(e => e.temperature))
-    const low = Math.min(...tempReadings.map(r => r.temperature))
+  const first = tempReadings[0].temperature
 
+  const lastIndex = tempReadings.length - 1
+  const last = tempReadings[lastIndex].temperature
+  const average =
+    tempReadings.reduce((sum, e) => sum + e.temperature, 0) /
+    tempReadings.length
+  const high = Math.max(...tempReadings.map((e) => e.temperature))
+  const low = Math.min(...tempReadings.map((r) => r.temperature))
 
-    const temperatureResume: TemperatureSummary = {
-      first: first,
-      last: last,
-      average: average,
-      high: high,
-      low: low,
-    }
-
-    return temperatureResume
-  } else {
-    return null
+  const temperatureResume: TemperatureSummary = {
+    first: first,
+    last: last,
+    average: average,
+    high: high,
+    low: low,
   }
-}
 
+  return temperatureResume
+}
