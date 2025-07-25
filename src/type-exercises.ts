@@ -37,6 +37,18 @@ type withOutBoolean = OmitByType<
   boolean
 >
 
+const data = {
+  name: 'juan',
+  count: 10,
+  isReadonly: true,
+  isEnable: false,
+}
+function ExampleOmitByType(data: withOutBoolean) {
+  return data
+}
+
+ExampleOmitByType(data)
+
 /**
  * Exercise #2: Implement the utility type `If<C, T, F>`, which evaluates a condition `C`
  * and returns one of two possible types:
@@ -58,7 +70,17 @@ type If<C, T, F> = C extends true ? T : F
 
 // Add here your example
 type A = If<true, 'a', 'b'>
-type B = If<false, 'd', 'e'>
+type B = If<false, 'a', 'b'>
+
+function exampleCondition(a: A, b: B) {
+  if (a) {
+    return 'es true'
+  } else if (b) {
+    return 'es false'
+  }
+}
+
+exampleCondition('a', 'b')
 /**
  * Exercise #3: Recreate the built-in `Readonly<T>` utility type without using it.
  *
@@ -97,8 +119,13 @@ const todo: MyReadonly<Todo> = {
   description: 'foobar',
 }
 
-todo.title = "Hello"; 
-todo.description = "barFoo"
+function ExampleTodo() {
+  return todo
+}
+
+ExampleTodo()
+// todo.title = "Hello";
+// todo.description = "barFoo"
 /**
  * Exercise #4: Recreate the built-in `ReturnType<T>` utility type without using it.
  *
@@ -132,6 +159,11 @@ const func = (check: boolean) => {
 
 type a = MyReturnType<typeof func>
 
+function exampleReturnType(a: a) {
+  return a
+}
+
+exampleReturnType(1)
 /**
  * Exercise #5: Extract the type inside a wrapped type like `Promise`.
  *
@@ -155,6 +187,11 @@ type ExampleType = Promise<number>
 
 type test = MyAwaited<ExampleType>
 
+async function examplePromise(letter: test) {
+  return letter
+}
+
+examplePromise(10)
 /**
  * Exercise 6: Create a utility type `RequiredByKeys<T, K>` that makes specific keys of `T` required.
  *
@@ -197,6 +234,17 @@ type Merge<T> = {
   [P in keyof T]: T[P]
 }
 
-type testing = Merge<MyEditableRequiered<User, 'name'>>
+type MutableRequired = Merge<MyEditableRequiered<User, 'name'>>
 
 // Add here your example
+
+const exampleConcat = {
+  name: 'Brandon',
+  age: 10,
+  address: 'colonial',
+}
+function TestingConcat(example: MutableRequired) {
+  return example
+}
+
+TestingConcat(exampleConcat)
