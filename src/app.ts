@@ -13,35 +13,50 @@ interface TemperatureSummary {
   average: number
 }
 
-let processedData: TemperatureReading[] = new Array<TemperatureReading>();
+let processedDataMap: Map<string, Map<number, { temperatures: number[] }>> = new Map()
 export function processReadings(readings: TemperatureReading[]): void {
-  processedData = readings;
+  readings.map((reading) => {
+    const normalizedDate = new Date(
+      reading.time.getFullYear(),
+      reading.time.getMonth(),
+      reading.time.getDate(),
+    )
+    const dateKey = normalizedDate.getTime()
+
+    if (!processedDataMap.has(reading.city)) {
+      processedDataMap.set(reading.city, new Map())
+    }
+    const cityMap = processedDataMap.get(reading.city)!
+    if (!cityMap.has(dateKey)) {
+      cityMap.set(dateKey, { temperatures: [] })
+    }
+    const dateArray = cityMap.get(dateKey)!
+
+    dateArray.temperatures.push(reading.temperature)
+    cityMap.set(dateKey, dateArray)
+    processedDataMap.set(reading.city, cityMap)
+  })
 }
 
 export function getTemperatureSummary(
   date: Date,
   city: string,
 ): TemperatureSummary | null {
-  
-  const dataCityReadings = processedData.filter(reading => reading.city === city);
-  const dataFilterByDate = dataCityReadings.filter(//filter getting year, moth and day bcs of Date type, it can receive not only the year but time as well
-    reading =>
-      reading.time.getFullYear() === date.getFullYear() && 
-      reading.time.getMonth() === date.getMonth() &&
-      reading.time.getDate() === date.getDate()
-  );
+  const cityMap = processedDataMap.get(city)
+  if (!cityMap) return null
 
-  if(dataFilterByDate.length !== 0){
-    const temperatures = dataFilterByDate.map(dataDate => dataDate.temperature);
-    const temperatureSummary: TemperatureSummary = {
-      first: temperatures[0],
-      average: temperatures.reduce((sum, t) => sum + t, 0) / temperatures.length,
-      high: Math.max(...temperatures),
-      last: temperatures[temperatures.length - 1],
-      low: Math.min(...temperatures)
-    }
-    return temperatureSummary;
+  const dateKey = date.getTime()
+  const dateArray = cityMap.get(dateKey)
+  if (!dateArray) return null
+
+  const temperatures = dateArray.temperatures
+  const temperatureSummary: TemperatureSummary = {
+    first: temperatures[0],
+    average: temperatures.reduce((sum, t) => sum + t, 0) / temperatures.length,
+    high: Math.max(...temperatures),
+    last: temperatures[temperatures.length - 1],
+    low: Math.min(...temperatures),
   }
 
-  return null;
+  return temperatureSummary
 }
